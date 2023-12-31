@@ -1,81 +1,385 @@
-<html>
-
+<!doctype html>
+<html lang="en">
 <head>
-  <title>DDNS Updater</title>
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
-  <style>
-    table {
-      font-family: arial, sans-serif;
-      font-size: 14px;
-      font-size: 1vw;
-      border-collapse: collapse;
-      width: 100%;
-    }
+    <title>DDNS Updater</title>
 
-    td,
-    th {
-      border: 2px solid #9a9fa1;
-      text-align: center;
-      padding: 1%;
-      max-width: 35%;
-      transition: all 0.7s;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
-    th {
-      background-color: #d8daf7;
-    }
+    <link rel="icon" type="image/xml+svg" sizes="32x32" href="./images/ddns-updater-favicon.svg">
+    <link rel="icon" type="image/xml+svg" sizes="16x16" href="./images/ddns-updater-favicon.svg">
 
-    tr:nth-child(odd) {
-      background-color: #e6f7ea;
-    }
+    <link rel="stylesheet" href="./css/tw.css"/>
 
-    tr:nth-child(even) {
-      background-color: #f3ebe3;
-    }
-
-    tr {
-      transition: all 0.7s;
-    }
-
-    tr:hover {
-      background: #c1e2f0;
-    }
-
-    a {
-      text-decoration: none;
-    }
-  </style>
 </head>
 
-<body>
-  <table>
-    <tr>
-      <th>Domain</th>
-      <th>Host</th>
-      <th>Provider</th>
-      <th>IP version</th>
-      <th>Update status</th>
-      <th>Set IP</th>
-      <th>Previous IPs (reverse chronological order)</th>
-    </tr>
-    {{range .Rows}}
-    <tr>
-      <td>{{.Domain}}</td>
-      <td>{{.Host}}</td>
-      <td>{{.Provider}}</td>
-      <td>{{.IPVersion}}</td>
-      <td>{{.Status}}</td>
-      <td>{{.CurrentIP}}</td>
-      <td>{{.PreviousIPs}}</td>
-    </tr>
-    {{end}}
-  </table>
-  <div>
-    Made by <a href="https://qqq.ninja">Quentin McGaw</a>
-  </div>
-  <div>
-    <a href="https://github.com/qdm12/ddns-updater">github.com/qdm12/ddns-updater</a>
-  </div>
+<body class="bg-slate-200 dark:bg-slate-500 font-sans leading-normal tracking-normal h-full flex flex-col justify-between">
+
+<header class="bg-gray-800 dark:bg-black pt-8 pb-8 relative z-10">
+    <div class="container px-6 mx-auto flex flex-row lg:flex-row justify-between lg:items-center">
+        <div class="flex-col flex lg:flex-row items-start lg:items-center">
+            <img role="img" class="border-2 border-white rounded-full mr-6 h-16"
+                 src="images/ddns-updater.svg"
+                 alt="DDNS Updater Icon"/>
+            <h1 class="text-4xl font-bold leading-tight text-white mb-2">DDNS Updater</h1>
+        </div>
+        <h2 class="sm:text-lg md:text-xl lg:text-2xl font-bold leading-normal text-gray-800 dark:text-white mx-4 pb-6 pt-4">
+            Status Report
+        </h2>
+    </div>
+</header>
+
+
+<main class="mx-auto pt-4 md:pt-2 px-6 h-full w-full">
+
+    <div class="container mx-auto">
+
+        <div class="rounded shadow relative bg-white dark:bg-gray-600 z-10 my-8 w-full shadow-black/25 shadow-md">
+
+                <div class="overflow-x-auto">
+                    <table class="w-full whitespace-nowrap bg-gray-600 dark:bg-black rounded">
+                        <thead>
+                        <tr class="h-20 w-full text-sm leading-none text-gray-200 dark:text-gray-200 ">
+                            <th tabindex="0" class="text-lg focus:outline-none font-bold text-left px-2 pl-4">Domain
+                            </th>
+                            <th tabindex="0" class="text-lg focus:outline-none font-bold text-left px-2">Host</th>
+                            <th tabindex="0" class="text-lg focus:outline-none font-bold text-left px-2">Provider</th>
+                            <th tabindex="0" class="text-lg focus:outline-none font-bold text-left px-2">IP Version</th>
+                            <th tabindex="0" class="text-lg focus:outline-none font-bold text-left px-2" colspan="2">Status</th>
+                            <th tabindex="0" class="text-lg focus:outline-none font-bold text-left px-2">Current IP</th>
+                            <th tabindex="0" class="text-lg focus:outline-none font-bold text-left px-2 w-32"> Previous
+                                IP<br><span class="text-xs">(reverse datetime)</span></th>
+                        </tr>
+                        </thead>
+                        <tbody class="w-full">
+                        <span class="hidden">{{range .Rows}}</span>
+                        <tr class="h-20 text-sm leading-none text-gray-800 dark:text-white hover:text-gray-100  border-b border-t border-gray-200 dark:border-gray-500 bg-white dark:bg-gray-800 hover:bg-gray-700 dark:hover:bg-gray-700 transition ease-in-out duration-500  ">
+                            <td tabindex="0" class="focus:outline-none px-2 pl-4">{{.Domain}}</td>
+                            <td tabindex="0" class="focus:outline-none px-2">{{.Host}}</td>
+                            <td class="px-2">
+                                <div class="flex items-center">
+                                    <img tabindex="0"
+                                         class="focus:outline-none shadow-md shadow-black/25 rounded-md border border-white border-2 w-16 h-16 mr-3"
+                                         src="images/{{.Provider}}-logo.svg"
+                                         alt="Logo: {{.Provider}}"/>
+                                    <span tabindex="0" class="focus:outline-none sr-only">{{.Provider}}</span>
+                                </div>
+                            </td>
+                            <td tabindex="0" class="focus:outline-none px-2">
+                                {{.IPVersion}}
+                            </td>
+                            <td class="px-2" >
+                                <div class="w-20 h-6 flex items-center justify-center bg-blue-700 rounded-full">
+                                    <p tabindex="0" class="focus:outline-none text-xs leading-3 text-blue-50">
+                                        {{.Status}}
+                                    </p>
+                                </div>
+                            </td>
+                            <td class="px-2">
+                                <div class="flex items-center justify-center">
+                                    <p class="text-xs">{{.StatusMessage}}</p>
+                                </div>
+                            </td>
+                            <td tabindex="0" class="focus:outline-none px-2">
+                                {{.CurrentIP}}
+                            </td>
+                            <td class="px-2 pr-4">
+                                {{.PreviousIPs}}
+                            </td>
+                        </tr>
+                        <span class="hidden">{{end}}</span>
+
+
+                        <tr class="h-20 text-sm leading-none text-gray-800 dark:text-white hover:text-gray-100  border-b border-t border-gray-200 dark:border-gray-500 bg-white dark:bg-gray-800 hover:bg-gray-700 dark:hover:bg-gray-700 transition ease-in-out duration-500  ">
+                            <td tabindex="0" class="focus:outline-none px-2 pl-4">somedomain</td>
+                            <td tabindex="0" class="focus:outline-none px-2">dd24.com</td>
+                            <td class="px-2">
+                                <div class="flex items-center">
+                                    <img tabindex="0" 
+                                         class="focus:outline-none shadow-md shadow-black/25 rounded-md border border-white border-2 w-16 h-16 mr-3"
+                                         src="images/dd24-logo.svg"
+                                         alt="Logo: dd24"/>
+                                    <span tabindex="0" class="focus:outline-none  sr-only">dd24</span>
+                                </div>
+                            </td>
+                            <td tabindex="0" class="focus:outline-none px-2">
+                                v6
+                            </td>
+                            <td class="px-2">
+                                <div class="w-20 h-6 flex items-center justify-center bg-green-700 rounded-full">
+                                    <p tabindex="0"
+                                       class="focus:outline-none text-xs leading-3 text-green-50 font-bold">
+                                        Success
+                                    </p>
+                                </div>
+                            </td>
+
+                            <td class="px-2">
+                                <div class="flex items-center justify-center">
+                                    <p class="text-xs">
+                                        (changed to 106.69.169.181), 8s ago
+                                    </p>
+                                </div>
+                            </td>
+                            <td tabindex="0" class="focus:outline-none px-2">
+                                123.456.789.012
+                            </td>
+                            <td class="px-2 pr-4">
+                                987.654.321.098
+                            </td>
+                        </tr>
+
+                        <tr class="h-20 text-sm leading-none text-gray-800 dark:text-white hover:text-gray-100  border-b border-t border-gray-200 dark:border-gray-500 bg-white dark:bg-gray-800 hover:bg-gray-700 dark:hover:bg-gray-700 transition ease-in-out duration-500  ">
+                            <td tabindex="0" class="focus:outline-none px-2 pl-4">anotherdomain</td>
+                            <td tabindex="0" class="focus:outline-none px-2">freedns</td>
+                            <td class="px-2">
+                                <div class="flex items-center">
+                                    <img tabindex="0" 
+                                         class="focus:outline-none shadow-md shadow-black/25 rounded-md border border-white border-2 w-16 h-16 mr-3"
+                                         src="images/freedns-logo.svg"
+                                         alt="Logo: freedns"/>
+                                    <span tabindex="0" class="focus:outline-none  sr-only">freedns</span>
+                                </div>
+                            </td>
+                            <td tabindex="0" class="focus:outline-none px-2">
+                                v4
+                            </td>
+                            <td class="px-2">
+                                <div class="w-20 h-6 flex items-center justify-center bg-red-700 rounded-full">
+                                    <p tabindex="0" class="focus:outline-none text-xs leading-3 text-red-50">
+                                        Failure
+                                    </p>
+                                </div>
+                            </td>
+                            <td class="px-2">
+                                <div class="flex items-center justify-center">
+                                    <p class="text-xs"></p>
+                                </div>
+                            </td>
+                            <td tabindex="0" class="focus:outline-none px-2">
+                                123.456.789.012
+                            </td>
+                            <td class="px-2">
+                                987.654.321.098
+                            </td>
+                        </tr>
+
+
+                        <tr class="h-20 text-sm leading-none text-gray-800 dark:text-white hover:text-gray-100  border-b border-t border-gray-200 dark:border-gray-500 bg-white dark:bg-gray-800 hover:bg-gray-700 dark:hover:bg-gray-700 transition ease-in-out duration-500  ">
+                            <td tabindex="0" class="focus:outline-none px-2 pl-4">{{.Domain}}</td>
+                            <td tabindex="0" class="focus:outline-none px-2">{{.Host}}</td>
+                            <td class="px-2">
+                                <div class="flex items-center">
+                                    <img tabindex="0" 
+                                         class="focus:outline-none shadow-md shadow-black/25 rounded-md border border-white border-2 w-16 h-16 mr-3"
+                                         src="images/google-cloud-logo.svg"
+                                         alt="Logo: google-cloud"/>
+                                    <span tabindex="0" class="focus:outline-none  sr-only">google-cloud</span>
+                                </div>
+                            </td>
+                            <td tabindex="0" class="focus:outline-none px-2">
+                                v4
+                            </td>
+                            <td class="px-2">
+                                <div class="w-20 h-6 flex items-center justify-center bg-sky-700 rounded-full">
+                                    <p tabindex="0" class="focus:outline-none text-xs leading-3 text-sky-50">
+                                        Up To Date
+                                    </p>
+                                </div>
+                            </td>
+                            <td class="px-2">
+                                <div class="flex items-center justify-center">
+                                    <p class="text-xs">(no IP change for 7m), 5m8s ago</p>
+                                </div>
+                            </td>
+                            <td tabindex="0" class="focus:outline-none px-2">
+                                123.456.789.012
+                            </td>
+                            <td class="px-2">
+                                987.654.321.098
+                            </td>
+                        </tr>
+
+
+                        <tr class="h-20 text-sm leading-none text-gray-800 dark:text-white hover:text-gray-100  border-b border-t border-gray-200 dark:border-gray-500 bg-white dark:bg-gray-800 hover:bg-gray-700 dark:hover:bg-gray-700 transition ease-in-out duration-500  ">
+                            <td tabindex="0" class="focus:outline-none px-2 pl-4">{{.Domain}}</td>
+                            <td tabindex="0" class="focus:outline-none px-2">{{.Host}}</td>
+                            <td class="px-2">
+                                <div class="flex items-center">
+                                    <img tabindex="0" 
+                                         class="focus:outline-none shadow-md shadow-black/25 rounded-md border border-white border-2 w-16 h-16 mr-3"
+                                         src="images/gandi-logo.svg"
+                                         alt="Logo: gandi"/>
+                                    <span tabindex="0" class="focus:outline-none  sr-only">gandi</span>
+                                </div>
+                            </td>
+                            <td tabindex="0" class="focus:outline-none px-2">
+                                v6
+                            </td>
+                            <td class="px-2">
+                                <div class="w-20 h-6 flex items-center justify-center bg-orange-700 rounded-full">
+                                    <p tabindex="0" class="focus:outline-none text-xs leading-3 text-orange-50">
+                                        Updating
+                                    </p>
+                                </div>
+                            </td>
+
+                            <td class="px-2">
+                                <div class="flex items-center justify-center">
+                                    <p class="text-xs"></p>
+                                </div>
+                            </td>
+                            <td tabindex="0" class="focus:outline-none px-2">
+                                123.456.789.012
+                            </td>
+                            <td class="px-2">
+                                987.654.321.098
+                            </td>
+                        </tr>
+
+                        <tr class="h-20 text-sm leading-none text-gray-800 dark:text-white hover:text-gray-100  border-b border-t border-gray-200 dark:border-gray-500 bg-white dark:bg-gray-800 hover:bg-gray-700 dark:hover:bg-gray-700 transition ease-in-out duration-500  ">
+                            <td tabindex="0" class="focus:outline-none px-2 pl-4">{{.Domain}}</td>
+                            <td tabindex="0" class="focus:outline-none px-2">{{.Host}}</td>
+                            <td class="px-2">
+                                <div class="flex items-center">
+                                    <img tabindex="0" 
+                                         class="focus:outline-none shadow-md shadow-black/25 rounded-md border border-white border-2 w-16 h-16 mr-3"
+                                         src="images/dreamhost-logo.svg"
+                                         alt="Logo: dreamhost"/>
+                                    <span tabindex="0" class="focus:outline-none  sr-only">dreamhost</span>
+                                </div>
+                            </td>
+                            <td tabindex="0" class="focus:outline-none px-2">
+                                v6
+                            </td>
+                            <td class="px-2">
+                                <div class="w-20 h-6 flex items-center justify-center bg-purple-700 rounded-full">
+                                    <p tabindex="0" class="focus:outline-none text-xs leading-3 text-purple-50">
+                                        Unset
+                                    </p>
+                                </div>
+                            </td>
+
+                            <td class="px-2">
+                                <div class="flex items-center justify-center">
+                                    <p class="text-xs"></p>
+                                </div>
+                            </td>
+                            <td tabindex="0" class="focus:outline-none px-2">
+                                123.456.789.012
+                            </td>
+                            <td class="px-2">
+                                987.654.321.098
+                            </td>
+                        </tr>
+
+
+                        <tr class="h-20 text-sm leading-none text-gray-800 dark:text-white hover:text-gray-100  border-b border-t border-gray-200 dark:border-gray-500 bg-white dark:bg-gray-800 hover:bg-gray-700 dark:hover:bg-gray-700 transition ease-in-out duration-500  ">
+                            <td tabindex="0" class="focus:outline-none px-2 pl-4">{{.Domain}}</td>
+                            <td tabindex="0" class="focus:outline-none px-2">{{.Host}}</td>
+                            <td class="px-2">
+                                <div class="flex items-center">
+                                    <img tabindex="0" 
+                                         class="focus:outline-none shadow-md shadow-black/25 rounded-md border border-white border-2 w-16 h-16 mr-3"
+                                         src="images/inwx-logo.svg"
+                                         alt="Logo: inwx"/>
+                                    <span tabindex="0" class="focus:outline-none  sr-only">inwx</span>
+                                </div>
+                            </td>
+                            <td tabindex="0" class="focus:outline-none px-2">
+                                v6
+                            </td>
+                            <td class="px-2">
+                                <div class="w-20 h-6 flex items-center justify-center bg-slate-700 rounded-full">
+                                    <p tabindex="0" class="focus:outline-none text-xs leading-3 text-slate-50">
+                                        Unknown
+                                    </p>
+                                </div>
+                            </td>
+
+                            <td class="px-2">
+                                <div class="flex items-center justify-center">
+                                    <p class="text-xs"></p>
+                                </div>
+                            </td>
+                            <td tabindex="0" class="focus:outline-none px-2">
+                                123.456.789.012
+                            </td>
+                            <td class="px-2">
+                                987.654.321.098
+                            </td>
+                        </tr>
+
+                        <tr class="h-20 text-sm leading-none text-gray-800 dark:text-white hover:text-gray-100  border-b border-t border-gray-200 dark:border-gray-500 bg-white dark:bg-gray-800 hover:bg-gray-700 dark:hover:bg-gray-700 transition ease-in-out duration-500  ">
+                            <td tabindex="0" class="focus:outline-none px-2 pl-4">{{.Domain}}</td>
+                            <td tabindex="0" class="focus:outline-none px-2">{{.Host}}</td>
+                            <td class="px-2">
+                                <div class="flex items-center">
+                                    <img tabindex="0" 
+                                         class="focus:outline-none shadow-md shadow-black/25 rounded-md border border-white border-2 w-16 h-16 mr-3"
+                                         src="images/-logo.svg"
+                                         alt="Logo: inwx"/>
+                                    <span tabindex="0" class="focus:outline-none  sr-only">inwx</span>
+                                </div>
+                            </td>
+                            <td tabindex="0" class="focus:outline-none px-2">
+                                v6
+                            </td>
+                            <td class="px-2">
+                                <div class="w-20 h-6 flex items-center justify-center bg-slate-700 rounded-full">
+                                    <p tabindex="0" class="focus:outline-none text-xs leading-3 text-slate-50">
+                                        Unknown
+                                    </p>
+                                </div>
+                            </td>
+
+                            <td class="px-2">
+                                <div class="flex items-center justify-center">
+                                    <p class="text-xs"></p>
+                                </div>
+                            </td>
+                            <td tabindex="0" class="focus:outline-none px-2">
+                                123.456.789.012
+                            </td>
+                            <td class="px-2">
+                                987.654.321.098
+                            </td>
+                        </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+        </div>
+
+    </div>
+
+</main>
+
+<footer class="pt-16">
+    <div tabindex="0" aria-label="footer" class="focus:outline-none w-full bg-gray-900 py-12">
+        <div class="container mx-auto xl:flex text-center xl:text-left lg:text-left">
+            <div class="xl:w-1/2 sm:w-full mb-6 xl:mb-0">
+                <ul class="xl:flex lg:flex md:flex sm:flex justify-start gap-8">
+                    <li class="text-white hover:text-gray-300 mb-3 xl:mb-0 lg:mb-0 md:mb-0 sm:mb-0">
+                        Made by <a href="https://qqq.ninja">Quentin McGaw</a>
+                    </li>
+                    <li class="text-white hover:text-gray-300 mb-3 xl:mb-0 lg:mb-0 md:mb-0 sm:mb-0">
+                        <a href="https://github.com/qdm12/ddns-updater">github.com/qdm12/ddns-updater</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="xl:w-1/2 sm:w-full mb-4 xl:mb-0">
+                <ul class="xl:flex lg:flex md:flex sm:flex justify-end gap-8">
+                    <li class="text-white hover:text-gray-300 mb-3 xl:mb-0 lg:mb-0 md:mb-0 sm:mb-0">
+                        <a href="https://github.com/AdyGCode">UI by Adrian Gould</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</footer>
 
 </body>
 
